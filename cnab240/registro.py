@@ -1,3 +1,7 @@
+from __future__ import print_function
+from builtins import str
+from past.builtins import basestring
+from builtins import object
 
 import os
 import json
@@ -26,10 +30,10 @@ class CampoBase(object):
 
         if self.formato == 'alfa':
             if not isinstance(valor, basestring):
-                print "{0} - {1}".format(self.nome, valor)
+                print("{0} - {1}".format(self.nome, valor))
                 raise errors.TipoError(self, valor)
             if len(valor) > self.digitos:
-                print u"truncating - {0} - {1}".format(self.nome, valor)
+                print(u"truncating - {0} - {1}".format(self.nome, valor))
                 # raise errors.NumDigitosExcedidoError(self, valor)
                 # reduz o len(valor)
                 cortar = len(valor) - self.digitos
@@ -37,24 +41,24 @@ class CampoBase(object):
 
         elif self.decimais:
             if not isinstance(valor, Decimal):
-                print u"{0} - {1}".format(self.nome, valor)
+                print(u"{0} - {1}".format(self.nome, valor))
                 raise errors.TipoError(self, valor)
 
             num_decimais = valor.as_tuple().exponent * -1
             if num_decimais != self.decimais:
-                print u"{0} - {1}".format(self.nome, valor)
+                print(u"{0} - {1}".format(self.nome, valor))
                 raise errors.NumDecimaisError(self, valor)
 
             if len(str(valor).replace('.', '')) > self.digitos:
-                print u"{0} - {1}".format(self.nome, valor)
+                print(u"{0} - {1}".format(self.nome, valor))
                 raise errors.NumDigitosExcedidoError(self, valor)
 
         else:
-            if not isinstance(valor, (int, long)):
-                print u"{0} - {1}".format(self.nome, valor)
+            if not isinstance(valor, (int, int)):
+                print(u"{0} - {1}".format(self.nome, valor))
                 raise errors.TipoError(self, valor)
             if len(str(valor)) > self.digitos:
-                print u"{0} - {1}".format(self.nome, valor)
+                print(u"{0} - {1}".format(self.nome, valor))
                 raise errors.NumDigitosExcedidoError(self, valor)
 
         self._valor = valor
@@ -80,7 +84,7 @@ class CampoBase(object):
 
         if self.formato == 'alfa' or self.decimais:
             if self.decimais:
-                valor = unicode(self.valor).replace('.', '')
+                valor = str(self.valor).replace('.', '')
                 chars_faltantes = self.digitos - len(valor)
                 return (u'0' * chars_faltantes) + valor
             else:
@@ -90,7 +94,7 @@ class CampoBase(object):
         return u'{0:0{1}d}'.format(self.valor, self.digitos)
 
     def __repr__(self):
-        return unicode(self)
+        return str(self)
 
     def __set__(self, instance, value):
         self.valor = value
@@ -124,7 +128,7 @@ class RegistroBase(object):
         campos = OrderedDict()
         attrs = {'_campos': campos}
 
-        for Campo in cls._campos_cls.values():
+        for Campo in list(cls._campos_cls.values()):
             campo = Campo()
             campos.update({campo.nome: campo})
             attrs.update({campo.nome: campo})
@@ -136,7 +140,7 @@ class RegistroBase(object):
         self.fromdict(kwargs)
 
     def necessario(self):
-        for campo in self._campos.values():
+        for campo in list(self._campos.values()):
             eh_controle = campo.nome.startswith('controle_') or campo.nome.startswith('servico_')
             if not eh_controle and campo.valor != None:
                 return True
@@ -145,7 +149,7 @@ class RegistroBase(object):
 
     def todict(self):
         data_dict = dict()
-        for campo in self._campos.values():
+        for campo in list(self._campos.values()):
             if campo.valor is not None:
                 data_dict[campo.nome] = campo.valor
         return data_dict
@@ -157,12 +161,12 @@ class RegistroBase(object):
             key.startswith('controle_'),
         ))
 
-        for key, value in data_dict.items():
+        for key, value in list(data_dict.items()):
             if hasattr(self, key) and not ignore_fields(key):
                 setattr(self, key, value)
 
     def carregar(self, registro_str):
-        for campo in self._campos.values():
+        for campo in list(self._campos.values()):
             valor = registro_str[campo.inicio:campo.fim].strip()
             if campo.decimais:
                 exponente = campo.decimais * -1
@@ -181,7 +185,7 @@ class RegistroBase(object):
                 campo.valor = valor
 
     def __unicode__(self):
-        return ''.join([unicode(campo) for campo in self._campos.values()])
+        return ''.join([str(campo) for campo in list(self._campos.values())])
 
 
 class Registros(object):
@@ -204,7 +208,7 @@ class Registros(object):
         cls_name = spec.get('nome').encode('utf8')
 
         campo_specs = spec.get('campos', {})
-        for key in sorted(campo_specs.iterkeys()):
+        for key in sorted(campo_specs.keys()):
             Campo = criar_classe_campo(campo_specs[key])
             entrada = {Campo.nome: Campo}
 

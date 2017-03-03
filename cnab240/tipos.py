@@ -1,7 +1,8 @@
 # -*- encoding: utf8 -*-
 
 import codecs
-import importlib
+from builtins import str
+from builtins import object
 from datetime import datetime
 from cnab240 import errors
 
@@ -30,7 +31,7 @@ class Evento(object):
         return object.__getattribute__(self, name)
 
     def __unicode__(self):
-        return u'\r\n'.join(unicode(seg) for seg in self._segmentos)
+        return u'\r\n'.join(str(seg) for seg in self._segmentos)
 
     def __len__(self):
         return len(self._segmentos)
@@ -109,10 +110,10 @@ class Lote(object):
 
         result = []
         if self.header != None:
-            result.append(unicode(self.header))
-        result.extend(unicode(evento) for evento in self._eventos)
+            result.append(str(self.header))
+        result.extend(str(evento) for evento in self._eventos)
         if self.trailer != None:
-            result.append(unicode(self.trailer))
+            result.append(str(self.trailer))
         return '\r\n'.join(result)
 
     def __len__(self):
@@ -275,16 +276,16 @@ class Arquivo(object):
                 self.trailer.totais_quantidade_registros += len(lote)
 
     def escrever(self, file_):
-        file_.write(unicode(self).encode('ascii'))
+        file_.write(str(self).encode('ascii'))
 
     def __unicode__(self):
         if not self._lotes:
             raise errors.ArquivoVazioError()
 
         result = []
-        result.append(unicode(self.header))
-        result.extend(unicode(lote) for lote in self._lotes)
-        result.append(unicode(self.trailer))
+        result.append(str(self.header))
+        result.extend(str(lote) for lote in self._lotes)
+        result.append(str(self.trailer))
         # Adicionar elemento vazio para arquivo terminar com \r\n
         result.append(u'')
         return u'\r\n'.join(result)
@@ -415,16 +416,16 @@ class ArquivoCobranca400(object):
                 self.trailer.totais_quantidade_registros += len(lote)
 
     def escrever(self, file_):
-        file_.write(unicode(self).encode('ascii'))
+        file_.write(str(self).encode('ascii'))
 
     def __unicode__(self):
         if not self._lotes:
             raise errors.ArquivoVazioError()
 
         result = []
-        result.append(unicode(self.header))
-        result.extend(unicode(lote) for lote in self._lotes)
-        result.append(unicode(self.trailer))
+        result.append(str(self.header))
+        result.extend(str(lote) for lote in self._lotes)
+        result.append(str(self.trailer))
         # Adicionar elemento vazio para arquivo terminar com \r\n
         result.append(u'')
         return u'\r\n'.join(result)

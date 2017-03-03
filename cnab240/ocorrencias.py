@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from builtins import str
 
 CODIGO_MOTIVOS_OCORRENCIA = {
     '02': {
