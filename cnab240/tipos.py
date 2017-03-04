@@ -5,6 +5,7 @@ from builtins import str
 from builtins import object
 from datetime import datetime
 from cnab240 import errors
+from io import IOBase
 
 
 class Evento(object):
@@ -131,7 +132,7 @@ class Arquivo(object):
         self._lotes = []
         self.banco = banco
         arquivo = kwargs.get('arquivo')
-        if isinstance(arquivo, (file, codecs.StreamReaderWriter)):
+        if isinstance(arquivo, (IOBase, codecs.StreamReaderWriter)):
             return self.carregar_retorno(arquivo)
 
         self.header = self.banco.registros.HeaderArquivo(**kwargs)

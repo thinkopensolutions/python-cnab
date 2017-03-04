@@ -1,5 +1,6 @@
 from __future__ import print_function
 from builtins import str
+from builtins import int
 from past.builtins import basestring
 from builtins import object
 
@@ -54,7 +55,7 @@ class CampoBase(object):
                 raise errors.NumDigitosExcedidoError(self, valor)
 
         else:
-            if not isinstance(valor, (int, int)):
+            if not isinstance(valor, int):
                 print(u"{0} - {1}".format(self.nome, valor))
                 raise errors.TipoError(self, valor)
             if len(str(valor)) > self.digitos:
@@ -104,7 +105,6 @@ class CampoBase(object):
 
 
 def criar_classe_campo(spec):
-
     nome = spec.get('nome')
     inicio = spec.get('posicao_inicio') - 1
     fim = spec.get('posicao_fim')
@@ -118,8 +118,9 @@ def criar_classe_campo(spec):
         'decimais': spec.get('decimais', 0),
         'default': spec.get('default'),
     }
-
-    return type(nome.encode('utf8'), (CampoBase,), attrs)
+    if not isinstance(nome, str):
+        nome = nome.encode('utf-8')
+    return type(nome, (CampoBase,), attrs)
 
 
 class RegistroBase(object):
@@ -134,7 +135,7 @@ class RegistroBase(object):
             attrs.update({campo.nome: campo})
 
         new_cls = type(cls.__name__, (cls, ), attrs)
-        return super(RegistroBase, cls).__new__(new_cls, **kwargs)
+        return super(RegistroBase, cls).__new__(new_cls)
 
     def __init__(self, **kwargs):
         self.fromdict(kwargs)
@@ -205,7 +206,7 @@ class Registros(object):
     def criar_classe_registro(self, spec):
         campos = OrderedDict()
         attrs = {'_campos_cls': campos}
-        cls_name = spec.get('nome').encode('utf8')
+        cls_name = spec.get('nome')
 
         campo_specs = spec.get('campos', {})
         for key in sorted(campo_specs.keys()):
@@ -214,4 +215,6 @@ class Registros(object):
 
             campos.update(entrada)
 
+        if not isinstance(cls_name, str):
+            cls_name = cls_name.encode('utf-8')
         return type(cls_name, (RegistroBase, ), attrs)
