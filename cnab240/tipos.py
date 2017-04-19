@@ -248,6 +248,15 @@ class Arquivo(object):
 
             if "controlecob_data_gravacao" not in dir(header):
                 header.controlecob_data_gravacao = self.header.arquivo_data_de_geracao
+            if "data_credito" not in dir(header):
+                header.data_credito = self.header.arquivo_data_de_geracao
+            # above lines do not work because keys are present with value None
+            # hence it doesn't set value, it is how it was set in V8
+            if header.controlecob_data_gravacao is None:
+                header.controlecob_data_gravacao = self.header.arquivo_data_de_geracao
+            if header.data_credito is None:
+                header.data_credito = self.header.arquivo_data_de_geracao
+
 
         lote_cobranca.adicionar_evento(evento)
         # Incrementar numero de registros no trailer do arquivo
