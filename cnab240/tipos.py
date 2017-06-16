@@ -193,7 +193,11 @@ class Arquivo(object):
                     seg_u = self.banco.registros.SegmentoU()
                     seg_u.carregar(linha)
                     evento_aberto._segmentos.append(seg_u)
-                    evento_aberto = None
+
+                    evento_aberto = Evento(self.banco, int(codigo_evento))
+                    lote_aberto._eventos.append(evento_aberto)
+                    evento_aberto._segmentos.append(seg_u)
+
 
                 elif tipo_segmento == 'E':
                     seg_e = self.banco.registros.SegmentoE()
